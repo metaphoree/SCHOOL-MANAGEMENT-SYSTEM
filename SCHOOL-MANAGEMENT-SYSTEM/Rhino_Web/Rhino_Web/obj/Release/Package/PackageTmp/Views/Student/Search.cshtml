@@ -1,0 +1,161 @@
+﻿@model IPagedList<Rhino_Web.Models.StudentData>
+@using PagedList.Mvc;
+@using PagedList;
+
+
+<p>
+
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Roll)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Gender)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First()._Class)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Section)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Fathers_Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Mothers_Name)
+        </th>
+ <!--
+        <th>
+            @Html.DisplayNameFor(model => model.First().Parmanent_District)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Parmanent_Thana)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Parmanent_House_No)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Present_District)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Present_Thana)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Present_House_No)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Date_Of_Birth)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Blood_Group)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Parents_Mobile)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Picture)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Birth_Registration_Number)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().UserId)
+        </th>
+        <th></th>
+
+     -->
+    </tr>
+@if (Model.Count() == 0)
+{
+
+
+
+    <tr colspan="5"> No rows match search criteria</tr>
+
+
+
+}
+else
+{
+    foreach (var item in Model)
+    {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Roll)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Gender)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item._Class)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Section)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Fathers_Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Mothers_Name)
+        </td>
+        <!--
+        <td>
+            @Html.DisplayFor(modelItem => item.Parmanent_District)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Parmanent_Thana)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Parmanent_House_No)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Present_District)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Present_Thana)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Present_House_No)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Date_Of_Birth)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Blood_Group)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Parents_Mobile)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Picture)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Birth_Registration_Number)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UserId)
+        </td>
+            -->
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.StudentId }) |
+            @Html.ActionLink("Details", "Details", new { id = item.StudentId }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.StudentId })
+        </td>
+    </tr>
+    }
+}
+
+
+
+    @Html.PagedListPager(Model,page =>Url.Action("Common",new {page,search=Request.QueryString["search"],
+    searchBy=Request.QueryString["searchBy"]
+}), new PagedListRenderOptions() { Display = PagedListDisplayMode.IfNeeded })
+</table>

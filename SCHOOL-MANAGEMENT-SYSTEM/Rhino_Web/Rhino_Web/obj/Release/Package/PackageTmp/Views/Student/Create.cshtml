@@ -1,0 +1,381 @@
+﻿@model Rhino_Web.Models.StudentDataRegisterModel
+@using Rhino_Web.CustomHHelper;
+
+
+<link rel="stylesheet" type="text/css" href="~/Content/bootstrap-select.css" />
+<script type="text/javascript" src="~/Scripts/bootstrap-select.js"></script>
+
+
+<script>
+
+    $(document).ready(function () {
+
+        //        $('#btn').click(function () {
+
+        $('.selectpicker').selectpicker();
+
+        // $(".chosen").chosen();
+
+        //  });
+
+        var fileUpload = $('#imageUploadForm');
+        var alertMess = $('#alertMessage');
+        var showImage = $('#imageContainer');
+        $('#imageUploadForm').change(function (event) {
+
+            if (window.FormData !== undefined) {
+
+                var message = singleFileSelected(event);
+
+                if (message == "FileOk") {
+                    alertMess.html("");
+                    ///////////////////////
+                    var fileUploady = ($(fileUpload))[0].files[0];
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+
+                        $("#imageContainer").empty();
+                        var dataURL = reader.result;
+                        var img = new Image()
+                        img.src = dataURL;
+                        img.className = "thumb";
+                        img.height = 200;
+                        img.width = 200;
+
+                        $("#imageContainer").append(img);
+                    };
+                    reader.readAsDataURL(fileUploady);
+
+
+                    ////////////////////
+                    var formData = new FormData();
+
+
+                    //var file = document.getElementById("imageUploadForm").files[0];
+                    var file = fileUploady;
+                    formData.append("imageUploadForm", file);
+                    // var fileName = Path.GetFileName(file.FileName);
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/Student/UploadImageUsingAjax',
+                        data: formData,
+                        dataType: 'json',
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            //alert('succes!!');
+
+
+
+                        },
+                        error: function (error) {
+                            alert("error");
+                        }
+                    });
+                    //////////////////////////////////////////
+                }
+
+
+
+                else {
+                    //alert("khan");
+                    $('#alertMessage').html("<h5>" + message + "</h5>");
+                }
+            }
+            else {
+                $('#alertMessage').html("This browser doesn't support HTML5 file uploads!");
+            }
+
+
+        });
+
+        var singleFileSelected = function (evt) {
+            //var selectedFile = evt.target.files can use this  or select input file element
+            //and access it's files object
+            var selectedFile = ($("#imageUploadForm"))[0].files[0];//FileControl.files[0];
+            if (selectedFile) {
+
+                var FileSize = 0;
+                var imageType = /image.*/;
+                if (selectedFile.size > 1048576) {
+                    // FileSize = Math.round(selectedFile.size * 100 / 1048576) / 100 + " MB";
+                    return "Please Insert a Smaller Size File";
+                }
+
+                /*
+                else if (selectedFile.size > 1024) {
+        FileSize = Math.round(selectedFile.size * 100 / 1024) / 100 + " KB";
+    }
+                else {
+        FileSize = selectedFile.size + " Bytes";
+    }
+                // here we will add the code of thumbnail preview of upload images
+
+                $("#FileName").text("Name : " + selectedFile.name);
+                $("#FileType").text("type : " + selectedFile.type);
+                $("#FileSize").text("Size : " + FileSize);*/
+                else if (!(selectedFile.type == "image/jpeg" || selectedFile.type == "image/jpg" ||
+                    selectedFile.type == "image/png" || selectedFile.type == "image/gif")) {
+                    return "Please Insert Appropriate Format File";
+                }
+                /*
+                                else if ($(selectedFile).height() > 200 || $(selectedFile).width() > 200) {
+                                    return "Image Resolution Must Be Within (200x200)pixel";
+
+                                }*/
+
+
+                else { return "FileOk"; }
+            }
+        }
+
+    });
+
+
+
+
+
+</script>
+
+
+
+@using (Ajax.BeginForm("Create", "Student", null,
+                new AjaxOptions { UpdateTargetId = "creationResult", InsertionMode = InsertionMode.Replace, HttpMethod = "POST" }, new { id = "SimpleForm" }
+              ))
+{
+
+    //var items = new List<SelectListItem>()
+    //{
+    //    new SelectListItem() { Text = "Male", Value = "Male" },
+    //    new SelectListItem() { Text = "Female", Value = "Female" },
+    //};
+
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        <hr />
+
+        <div id="creationResult">
+            @{
+                if (ViewBag.IsRegistrationSuccessfull == "true")
+                {
+            <div class="alert alert-success alert-dismissable">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                <strong>Success!</strong> You have Successfully Registered a student
+            </div>
+                }
+                else if (ViewBag.IsRegistrationSuccessfull == "false")
+                {
+            <div class="alert alert-info alert-dismissable">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                <strong>Alert!</strong> Please give info Correctly for the required field.Dont Miss the Must Required Field
+            </div>
+                }
+            }
+        </div>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+        <div class="row">
+            <div class="col-md-3">
+
+
+                <div id="imageContainer" style="width:210px;height:210px;border:5px solid black">
+
+                </div>
+                <input type="file" id="imageUploadForm" />
+                <div>Upload Ur Profile Picture</div>
+
+                <div id="alertMessage">
+
+                </div>
+
+                @*<select class="selectpicker">
+                        <option>Mustard</option>
+                        <option>Ketchup</option>
+                        <option>Relish</option>
+                    </select>*@
+
+
+            </div>
+
+
+
+
+            <div class="col-md-3">
+
+                <div class="form-group">
+                    <!--Html.LabelFor(model => model.Name, htmlAttributes: new { class = "control-label col-md-2" })-->
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Name" } })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Roll, new { htmlAttributes = new { @class = "form-control", placeholder = "Roll" } })
+                        @Html.ValidationMessageFor(model => model.Roll, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+
+
+                    <div class="col-md-10">
+
+             @Html.DropDownListFor(model => model.Gender, new List<SelectListItem> {     
+              new SelectListItem{ Text="Male",Value="Male"},
+              new SelectListItem{ Text="Female",Value="Female"}
+}, "Select Gender", new { htmlAttributes = new { @class = "selectpicker" } })
+                    </div>
+                    <div>
+                        @Html.ValidationMessageFor(model => model.Gender, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model._Class, new { htmlAttributes = new { @class = "form-control", placeholder = "Class" } })
+                        @Html.ValidationMessageFor(model => model._Class, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Section, new { htmlAttributes = new { @class = "form-control", placeholder = "Section" } })
+                        @Html.ValidationMessageFor(model => model.Section, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Fathers_Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Father's Name" } })
+                        @Html.ValidationMessageFor(model => model.Fathers_Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Mothers_Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Mothers Name" } })
+                        @Html.ValidationMessageFor(model => model.Mothers_Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    @Html.Label("Permanent Address")
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Parmanent_District, new { htmlAttributes = new { @class = "form-control", placeholder = "District" } })
+                        @Html.ValidationMessageFor(model => model.Parmanent_District, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Parmanent_Thana, new { htmlAttributes = new { @class = "form-control", placeholder = "Thana" } })
+                        @Html.ValidationMessageFor(model => model.Parmanent_Thana, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Parmanent_House_No, new { htmlAttributes = new { @class = "form-control", placeholder = "House No" } })
+                        @Html.ValidationMessageFor(model => model.Parmanent_House_No, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+
+                <div class="form-group">
+                    @Html.Label("Present Address")
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Present_District, new { htmlAttributes = new { @class = "form-control", placeholder = "District" } })
+                        @Html.ValidationMessageFor(model => model.Present_District, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Present_Thana, new { htmlAttributes = new { @class = "form-control", placeholder = "Thana" } })
+                        @Html.ValidationMessageFor(model => model.Present_Thana, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Present_House_No, new { htmlAttributes = new { @class = "form-control", placeholder = "House No" } })
+                        @Html.ValidationMessageFor(model => model.Present_House_No, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <br /><br />
+
+            </div>
+            <div class="col-md-3">
+                @Html.Label("Date Of Birth")
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Date_Of_Birth, new { htmlAttributes = new { @class = "form-control", placeholder = "Date Of Birth" } })
+                        @Html.ValidationMessageFor(model => model.Date_Of_Birth, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Blood_Group, new { htmlAttributes = new { @class = "form-control", placeholder = "Blood Group" } })
+                        @Html.ValidationMessageFor(model => model.Blood_Group, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Parents_Mobile, new { htmlAttributes = new { @class = "form-control", placeholder = "Parents Mobile" } })
+                        @Html.ValidationMessageFor(model => model.Parents_Mobile, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <!--  <div class="form-group">
+
+                    <div class="col-md-10">
+                        Html.EditorFor(model => model.Picture, new { htmlAttributes = new { class = "form-control" } })
+                        Html.ValidationMessageFor(model => model.Picture, "", new { class = "text-danger" })
+
+                    </div>
+                </div> -->
+                <div class="form-group">
+
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Birth_Registration_Number, new { htmlAttributes = new { @class = "form-control", placeholder = "Birth Registration Number" } })
+                        @Html.ValidationMessageFor(model => model.Birth_Registration_Number, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </div>
+        <br /><br />
+        <div class="row">
+
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="submit" value="Add Student" class="btn btn-lg btn-block btn-primary" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4"></div>
+
+        </div>
+
+
+    </div>
+                }
+
+

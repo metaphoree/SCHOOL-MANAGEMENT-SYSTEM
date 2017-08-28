@@ -1,0 +1,50 @@
+﻿
+    <script type="text/javascript">
+        $(function () {
+            $("#search").keyup(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/Student/Search",
+                    contentType: "application/json; charset=utf-8",
+                    data: '{searchBy: "' + $('input[type="radio"]:checked').val() + '",search:"' +
+                    $('#search').val() +'"}',
+                    
+                   
+                    dataType: "html",
+                    success: function (response) {
+
+
+                        $('#searchResult').html(response);
+                    }, failure: function (response) {
+                        alert("Failre Happened");
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+<div id="searchResult">
+  @Html.Action("Search","Student",new {searchBy="",search="" })
+
+</div>
+
+
+
+    
+    @Html.RadioButton("searchBy", "Name",true)<text>Name</text>
+    @Html.RadioButton("searchBy", "Roll")<text>Roll</text> <br />
+    @Html.TextBox("search",null, new { id = "search" })
+    
+    <input  id="searchButton" type="button" value="search" />
+
+
+
